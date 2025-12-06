@@ -8,7 +8,7 @@ import Analysis from "./components/Analysis";
 import "./App.css";
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState("history"); // "history" | "analysis"
+  const [activeTab, setActiveTab] = useState("history"); 
   const [currentResult, setCurrentResult] = useState(null);
   const [history, setHistory] = useState([
     {
