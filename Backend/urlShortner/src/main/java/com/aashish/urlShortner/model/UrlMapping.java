@@ -3,8 +3,6 @@ package com.aashish.urlShortner.model;
 
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -69,7 +67,6 @@ public class UrlMapping {
         this.clickCount = clickCount;
     }
 }
-
 
 
 
