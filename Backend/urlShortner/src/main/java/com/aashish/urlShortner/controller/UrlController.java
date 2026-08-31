@@ -5,13 +5,12 @@ import com.aashish.urlShortner.model.UrlMapping;
 import com.aashish.urlShortner.services.UrlServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @Controller
 public class UrlController {
 
@@ -33,11 +32,12 @@ public class UrlController {
 
         return ResponseEntity.status(302)
                 .location(URI.create(longUrl))
-                .build();return ResponseEntity.status(302)
-                .location(URI.create(longUrl))
                 .build();
     }
-    }
 
+    @GetMapping("/urls")
+    public ResponseEntity<List<UrlMapping>> getRecentUrls() {
+        return ResponseEntity.ok(service.getRecentUrls());
+    }
 
 }

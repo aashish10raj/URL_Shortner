@@ -4,6 +4,7 @@ import com.aashish.urlShortner.model.UrlMapping;
 import com.aashish.urlShortner.repositories.UrlRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -55,4 +56,7 @@ public class UrlServices {
     }
 
 
+    public List<UrlMapping> getRecentUrls() {
+        return repository.findTop5ByOrderByCreatedAtDesc();
+    }
 }
