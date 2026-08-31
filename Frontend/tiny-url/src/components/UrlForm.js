@@ -1,12 +1,12 @@
 // src/components/UrlForm.js
 import React, { useState } from "react";
 
-const UrlForm = ({ onShorten }) => {
+const UrlForm = ({ onShorten, disabled }) => {
   const [url, setUrl] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!url.trim()) return;
+    if (!url.trim() || disabled) return;
     onShorten(url.trim());
     setUrl("");
   };
@@ -19,9 +19,10 @@ const UrlForm = ({ onShorten }) => {
         placeholder="Enter the long URL here..."
         value={url}
         onChange={(e) => setUrl(e.target.value)}
+        disabled={disabled}
       />
-      <button type="submit" className="submit-button">
-        Shorten
+      <button type="submit" className="submit-button" disabled={disabled}>
+        {disabled ? "Shortening..." : "Shorten"}
       </button>
     </form>
   );

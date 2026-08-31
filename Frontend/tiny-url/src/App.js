@@ -1,47 +1,50 @@
 // src/App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import UrlForm from "./components/UrlForm";
 import ShortUrlResult from "./components/ShortUrlResult";
 import History from "./components/History";
 import Analysis from "./components/Analysis";
+import { createShortUrl, getRecentUrls, API_BASE_URL } from "./Api";
 import "./App.css";
 
+const toHistoryEntry = (mapping) => ({
+  id: mapping.id,
+  originalUrl: mapping.longUrl,
+  shortUrl: `${API_BASE_URL}/${mapping.shortHash}`,
+  createdAt: mapping.createdAt
+    ? new Date(mapping.createdAt).toLocaleString()
+    : new Date().toLocaleString(),
+  clicks: mapping.clickCount ?? 0,
+});
+
 const App = () => {
-  const [activeTab, setActiveTab] = useState("history"); // "history" | "analysis"
+  const [activeTab, setActiveTab] = useState("history");
   const [currentResult, setCurrentResult] = useState(null);
-  const [history, setHistory] = useState([
-    {
-      id: 1,
-      originalUrl: "https://example.com/very/long/url/1",
-      shortUrl: "https://short.ly/abc123",
-      createdAt: "2025-12-05 10:00",
-      clicks: 10,
-    },
-    {
-      id: 2,
-      originalUrl: "https://another-long-url.com/path",
-      shortUrl: "https://short.ly/xyz789",
-      createdAt: "2025-12-05 11:30",
-      clicks: 3,
-    },
-  ]);
+  const [history, setHistory] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleShorten = (originalUrl) => {
-    // Simulate backend-generated short URL
-    const randomCode = Math.random().toString(36).substring(2, 8);
-    const shortUrl = `https://short.ly/${randomCode}`;
+  useEffect(() => {
+    getRecentUrls()
+      .then((mappings) => setHistory(mappings.map(toHistoryEntry)))
+      .catch((err) => setError(err.message || "Failed to load recent URLs."));
+  }, []);
 
-    const newEntry = {
-      id: Date.now(),
-      originalUrl,
-      shortUrl,
-      createdAt: new Date().toLocaleString(),
-      clicks: 0,
-    };
+  const handleShorten = async (originalUrl) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const mapping = await createShortUrl(originalUrl);
+      const newEntry = toHistoryEntry(mapping);
 
-    setCurrentResult(newEntry);
-    setHistory((prev) => [newEntry, ...prev]);
+      setCurrentResult(newEntry);
+      setHistory((prev) => [newEntry, ...prev].slice(0, 5));
+    } catch (err) {
+      setError(err.message || "Something went wrong while shortening the URL.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,7 +54,8 @@ const App = () => {
       <main className="main-content">
         <section className="shortener-section">
           <h1 className="title">URL Shortener</h1>
-          <UrlForm onShorten={handleShorten} />
+          <UrlForm onShorten={handleShorten} disabled={loading} />
+          {error && <p className="error-text">{error}</p>}
           <ShortUrlResult result={currentResult} />
         </section>
 
